@@ -24,6 +24,13 @@
   SMC_token: 18; 
   TXT_token: 19;
   XOP_token: 20;
+  LTP_token: 21; `(: left thread parentheses`
+  RTP_token: 22; `:) right thread parentheses`
+  LTB_token: 23; `{: left thread brace`
+  RTB_token: 24; `:} right thread brace`
+  THQ_token: 25; `:?: thread question`
+  THA_token: 26; `:!: thread answer`
+  
   
   scan_data: void;
   
