@@ -1,0 +1,311 @@
+`*-----------------------------------*`
+`*             >>>Pico<<<            *`
+`*            Theo D'Hondt           *`
+`*  VUB Programming Technology Lab   *`
+`*              (c)1997              *`
+`*-----------------------------------*`
+{ AOP_token:  1;
+  CAT_token:  2;
+  CEQ_token:  3;
+  COL_token:  4;
+  COM_token:  5;
+  END_token:  6;
+  FRC_token:  7;
+  LBC_token:  8;
+  LBR_token:  9;
+  LPR_token: 10;
+  MOP_token: 11;
+  NAM_token: 12;
+  NBR_token: 13;
+  RBC_token: 14;
+  RBR_token: 15;
+  ROP_token: 16;
+  RPR_token: 17;
+  SMC_token: 18; 
+  TXT_token: 19;
+  XOP_token: 20;
+  
+  scan_data: void;
+  
+  scan():
+    error('scanner not initialized');
+        
+  init_scan(Str):
+    { aop:  1;
+      apo:  2;
+      bkq:  3;
+      cat:  4;
+      col:  5;
+      com:  6;
+      dgt:  7;
+      eol:  8;
+      eql:  9;
+      exp: 10;
+      ill: 11; 
+      lbc: 12;
+      lbr: 13;
+      lpr: 14;
+      ltr: 15;
+      mns: 16;
+      mop: 17;
+      per: 18;
+      pls: 19;
+      quo: 20;
+      rbc: 21;
+      rbr: 22;
+      rop: 23;
+      rpr: 24;
+      smc: 25;
+      wsp: 26;
+      xop: 27;
+
+      siz: 27;
+        
+      ch_tab: [`end` wsp, wsp, wsp, wsp, wsp, wsp, wsp, 
+                wsp, wsp, wsp, wsp, wsp, eol, wsp, wsp, 
+                wsp, wsp, wsp, wsp, wsp, wsp, wsp, wsp, 
+                wsp, wsp, wsp, wsp, wsp, wsp, wsp, wsp, 
+                wsp, xop, quo, rop, aop, aop, mop, apo, 
+                lpr, rpr, mop, pls, com, mns, per, mop, 
+                dgt, dgt, dgt, dgt, dgt, dgt, dgt, dgt, 
+                dgt, dgt, col, smc, rop, eql, rop, xop, 
+                cat, ltr, ltr, ltr, ltr, exp, ltr, ltr, 
+                ltr, ltr, ltr, ltr, ltr, ltr, ltr, ltr, 
+                ltr, ltr, ltr, ltr, ltr, ltr, ltr, ltr, 
+                ltr, ltr, ltr, lbr, mop, rbr, xop, ltr, 
+                ill, ltr, ltr, ltr, ltr, exp, ltr, ltr, 
+                ltr, ltr, ltr, ltr, ltr, ltr, ltr, ltr, 
+                ltr, ltr, ltr, ltr, ltr, ltr, ltr, ltr, 
+                ltr, ltr, ltr, lbc, aop, rbc, aop, ill, 
+                ill, ill, ill, ill, ill, ill, ill, ill, 
+                ill, ill, ill, ill, ill, ill, ill, ill, 
+                ill, ill, ill, ill, ill, ill, ill, ill,       
+                ill, ill, ill, ill, ill, ill, ill, ill, 
+                ill, ill, ill, ill, ill, ill, ill, ill, 
+                ill, ill, ill, ill, ill, ill, ill, ill, 
+                ill, ill, ill, ill, ill, ill, ill, ill, 
+                ill, ill, ill, ill, ill, ill, ill, ill, 
+                ill, ill, ill, ill, ill, ill, ill, ill, 
+                ill, ill, ill, ill, ill, ill, ill, ill, 
+                ill, ill, ill, ill, ill, ill, ill, ill, 
+                ill, ill, ill, ill, ill, ill, ill, ill, 
+                ill, ill, ill, ill, ill, ill, ill, ill, 
+                ill, ill, ill, ill, ill, ill, ill, ill, 
+                ill, ill, ill, ill, ill, ill, ill, ill, 
+                ill, ill, ill, ill, ill, ill, ill, ill ];
+             
+      input: void;
+      pos: 0;
+      hold: 0;
+      ch: 0;
+
+      skip_ch():
+        ch:= if(pos > size(input),
+                0,
+                if((pos:= pos+1) > size(input),
+                   32,
+                   ord(input[pos])));
+                        
+      next_ch(Tkn):
+        { skip_ch();
+          Tkn };
+                
+      freeze():
+        hold:= pos;
+                
+      capture_name(Tkn):
+        { t[pos-hold]: input[(hold:= hold+1)-1];
+          scan_data:= implode(t);
+          Tkn };
+                
+      capture_text(Tkn):
+        { t[pos-hold-1]: input[(hold:= hold+1)-1];
+          scan_data:= implode(t);
+          Tkn };
+                
+      capture_number(Tkn):
+        { t[pos-hold]: input[(hold:= hold+1)-1];
+          scan_data:= number(implode(t));
+          Tkn };
+                
+      check(allowed):
+        if(ch = 0, false, allowed[ch_tab[ch]]);
+        
+      uncheck(allowed):
+        if(ch = 0, false, not(allowed[ch_tab[ch]]));
+        
+      mask@list:
+        { msk[siz]: false;
+          for(k: 1, k:= k+1, not(k > size(list)), 
+              msk[list[k]]:= true);
+          msk };
+        
+      apo_allowed: mask(apo);
+      apx_allowed: mask(apo,eol);
+      bkq_allowed: mask(bkq,eol);
+      dgt_allowed: mask(dgt);
+      eql_allowed: mask(eql);
+      exp_allowed: mask(exp);
+      nam_allowed: mask(dgt,exp,ltr);
+      opr_allowed: mask(aop,eql,mns,mop,pls,rop,xop);
+      per_allowed: mask(per);
+      quo_allowed: mask(quo);
+      qux_allowed: mask(eol,quo);
+      sgn_allowed: mask(pls,mns);
+      wsp_allowed: mask(wsp,eol);
+        
+      operator(Tkn):
+        { freeze();
+          until(uncheck(opr_allowed), skip_ch());
+          capture_name(Tkn) };
+
+      exponent():
+        { skip_ch();
+          if(check(sgn_allowed), skip_ch(), void);
+          if(check(dgt_allowed),
+             until(uncheck(dgt_allowed), skip_ch()),
+             error('digit required'));
+          capture_number(FRC_token) };
+        
+      fraction():
+        { skip_ch();
+          if(check(dgt_allowed),
+             until(uncheck(dgt_allowed), skip_ch()),
+             error('digit required'));
+          if(check(exp_allowed),
+             exponent(),
+             capture_number(FRC_token)) };
+        
+      aop_fun():
+        operator(AOP_token);
+          
+      apo_fun():
+        { skip_ch();
+          freeze();
+          while(uncheck(apx_allowed), skip_ch());
+          if(check(apo_allowed),
+             capture_text(next_ch(TXT_token)),
+             error("' required")) };
+          
+      bkq_fun():
+        { skip_ch();
+          while(uncheck(bkq_allowed), skip_ch());
+          skip_ch();
+          scan() };
+          
+      cat_fun():  
+        next_ch(CAT_token);
+          
+      col_fun():
+        { skip_ch();
+          if(check(eql_allowed),
+             next_ch(CEQ_token),
+             COL_token) };
+          
+      com_fun():  
+        next_ch(COM_token);
+          
+      dgt_fun():
+        { freeze();
+          until(uncheck(dgt_allowed), skip_ch());
+          if(check(per_allowed),
+             fraction(),
+             if(check(exp_allowed),
+                exponent(), 
+                capture_number(NBR_token))) };
+        
+      ill_fun():
+        { error('illegal character');
+          END_token };
+          
+      lbc_fun():  
+        next_ch(LBC_token);
+          
+      lbr_fun():  
+        next_ch(LBR_token);
+          
+      lpr_fun(): 
+        next_ch(LPR_token);
+          
+      ltr_fun():
+        { freeze();
+          until(uncheck(nam_allowed), skip_ch());
+          capture_name(NAM_token) };
+          
+      mop_fun():
+        operator(MOP_token);
+          
+      quo_fun():
+        { skip_ch();
+          freeze();
+          while(uncheck(qux_allowed), skip_ch());
+          if(check(quo_allowed),
+             capture_text(next_ch(TXT_token)),
+             error('" required')) };
+          
+      rbc_fun():  
+        next_ch(RBC_token);
+          
+      rbr_fun():  
+        next_ch(RBR_token);
+          
+      rop_fun():
+        operator(ROP_token);
+          
+      rpr_fun():  
+        next_ch(RPR_token);
+          
+      smc_fun():  
+        next_ch(SMC_token);
+          
+      wsp_fun():
+        { skip_ch();
+          scan() };
+          
+      xop_fun():
+        operator(XOP_token);
+          
+      fun_tab: [ aop_fun,
+                 apo_fun,
+                 bkq_fun,
+                 cat_fun,
+                 col_fun,
+                 com_fun,
+                 dgt_fun,
+                 wsp_fun,
+                 rop_fun,
+                 ltr_fun,
+                 ill_fun,
+                 lbc_fun,
+                 lbr_fun,
+                 lpr_fun,
+                 ltr_fun,
+                 aop_fun,
+                 mop_fun,
+                 ill_fun,
+                 aop_fun,
+                 quo_fun,
+                 rbc_fun,
+                 rbr_fun,
+                 rop_fun,
+                 rpr_fun,
+                 smc_fun,
+                 wsp_fun,
+                 xop_fun ];
+
+                 
+      init_scan(Str):=
+        { input:= explode(Str);
+          pos:= 0;
+          skip_ch();
+          void };
+              
+      scan():=
+        if(ch = 0,
+           END_token,
+           { fun: fun_tab[ch_tab[ch]];
+             fun() });
+                 
+      init_scan(Str) };
+
+  display('scanner installed', eoln) }

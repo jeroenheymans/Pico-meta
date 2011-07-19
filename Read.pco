@@ -1,0 +1,200 @@
+`*-----------------------------------*`
+`*             >>>Pico<<<            *`
+`*            Theo D'Hondt           *`
+`*  VUB Programming Technology Lab   *`
+`*              (c)1997              *`
+`*-----------------------------------*`
+{ read(Str):
+    { token: void;
+      begin_str: 'begin';
+      tab_str:   'tab';
+      msg_tab: [ 'additive operator',
+                 'application',
+                 'assignment',
+                 'definition',
+                 'comma',
+                 'end of text',
+                 'fraction',
+                 'left brace',
+                 'left bracket',
+                 'left parenthesis',
+                 'multiplicative operator',
+                 'name',
+                 'number',
+                 'right brace',
+                 'right bracket',
+                 'relational operator',
+                 'right parenthesis',
+                 'semicolon',
+                 'text',
+                 'exponentiation operator' ];
+                                                           
+      message@any:
+        error('Unexpected ', msg_tab[token]);
+          
+      skip():
+        token:= scan();
+        
+      next(Dat):
+        { skip();
+          Dat };
+        
+      expression():
+        void;
+                    
+      reference():
+        void;
+
+      operation(Opr, Tkn):
+        { opd: Opr();
+          while(token = Tkn,
+                { opr: next(scan_data);
+                  arg: [ opd, Opr() ];
+                  opd:= APL(opr, TAB(arg)) });
+              opd };
+
+      list(Sep, Trm):
+        { loop(count):
+            { exp: expression();
+              if(token = Sep,
+                 { skip();
+                   tab: loop(count+1);
+                   tab[count]:= exp },
+                 if(token = Trm,
+                    { skip();
+                      tab[count]: void;
+                      tab[count]:= exp },
+                    message())) };
+          TAB(loop(1)) };
+
+      number(): 
+        NBR(next(scan_data));
+
+      fraction(): 
+        FRC(next(scan_data));
+
+      text():
+        TXT(next(scan_data));
+
+      application(Var):
+        { skip();
+          if(token = RPR_token,
+             APL(Var, next(Empty)),
+             APL(Var, list(COM_token, RPR_token))) };
+
+      apply(Var):
+        { skip();
+          ref: reference();
+          APL(Var, ref) };
+
+      tabulation(Var):
+        { skip();
+          idx: expression();
+          if(token = RBR_token, skip(), message());
+          TBL(Var, idx) };
+
+      variable(Var):
+        VAR(Var);
+
+      prefix(Var):
+        { arg: [ reference() ];
+          APL(Var, TAB(arg)) };
+
+      var_case: case(LPR_token => application,
+                     LBR_token => tabulation,
+                     CAT_token => apply,
+                          else => variable);
+
+      name():
+        { var: next(scan_data);
+          cas: var_case(token);
+          cas(var) };
+
+      opr_case: case(NBR_token => prefix,
+                     FRC_token => prefix,
+                     TXT_token => prefix,
+                     NAM_token => prefix,
+                     ROP_token => prefix,
+                     AOP_token => prefix,
+                     MOP_token => prefix,
+                     XOP_token => prefix,
+                     LPR_token => application,
+                     CAT_token => apply,
+                     LBR_token => tabulation,
+                          else => variable);
+
+      operator():
+        { opr: next(scan_data);
+          cas: opr_case(token);
+          cas(opr) };
+
+      parentheses():
+        { skip();
+          exp: expression();
+          if(token = RPR_token, skip(), message());
+          exp };
+
+      braces():
+        { skip();
+          APL(begin_str, list(SMC_token, RBC_token)) };
+
+      brackets():
+        { skip();
+          if(token = RBR_token, 
+             APL(tab_str, next(Empty)),
+             APL(tab_str, list(COM_token, RBR_token))) };
+
+      ref_case: case(NBR_token => number,
+                     FRC_token => fraction,
+                     TXT_token => text,
+                     NAM_token => name,
+                     ROP_token => operator,
+                     AOP_token => operator,
+                     MOP_token => operator,
+                     XOP_token => operator,
+                     LPR_token => parentheses,
+                     LBC_token => braces,
+                     LBR_token => brackets,
+                          else => message);
+      reference():=
+        { cas: ref_case(token); 
+          cas() };
+
+      factor(): 
+        operation(reference, XOP_token);
+
+      term(): 
+        operation(factor, MOP_token);
+
+      comparand(): 
+        operation(term, AOP_token);
+
+      invocation(): 
+        operation(comparand, ROP_token);
+
+      identity(Inv): 
+        Inv;
+
+      definition(Inv): 
+        DEF(next(Inv), expression());
+
+      assignment(Inv): 
+        SET(next(Inv), expression());
+
+      exp_case: case(COL_token => definition,
+                     CEQ_token => assignment,
+                          else => identity);
+
+      expression():= 
+        { inv: invocation();
+          cas: exp_case(token); 
+          cas(inv) };   
+         
+      read(Str):= 
+        { init_scan(Str); 
+          token := scan(); 
+          expression() };
+
+      read(Str) };
+
+  display('reader installed', eoln) }

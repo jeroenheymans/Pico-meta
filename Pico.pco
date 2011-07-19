@@ -1,0 +1,18 @@
+`*-----------------------------------*`
+`*             >>>Pico<<<            *`
+`*            Theo D'Hondt           *`
+`*  VUB Programming Technology Lab   *`
+`*              (c)1997              *`
+`*-----------------------------------*`
+{ Pico():
+    { make_global();
+      display('start Pico', eoln);
+      entry: accept(); 
+      while(not(entry = ''),
+            { display(eoln);
+              print(eval(read(entry)));
+              display(eoln);
+              entry:= accept() });
+      display(eoln, 'end Pico') };
+  Pico() }
+

@@ -1,0 +1,34 @@
+`*-----------------------------------*`
+`*             >>>Pico<<<            *`
+`*            Theo D'Hondt           *`
+`*  VUB Programming Technology Lab   *`
+`*              (c)1997              *`
+`*-----------------------------------*`
+{ tag => fun:
+    [tag, fun];
+
+  else: 0;
+
+  case@clauses:
+    { default: void;
+      siz: size(clauses);
+      max: 0;
+      for(k: 1, k:= k+1, not(k > siz),
+        { clause: clauses[k];
+          if(clause[1] = else,
+             default:= clause[2],
+             if(clause[1] > max,
+                max:= clause[1],
+                void)) });
+      tbl[max]: default;
+      for(k: 1, k:= k+1, not(k > siz),
+        { clause: clauses[k];
+          if(clause[1] = else,
+             void,
+             tbl[clause[1]]:= clause[2]) });
+             
+      select(tag):
+        if(tag > max, default, tbl[tag]) };
+
+  display('case loaded', eoln) }
+

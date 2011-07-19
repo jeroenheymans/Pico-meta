@@ -1,0 +1,100 @@
+`*-----------------------------------*`
+`*             >>>Pico<<<            *`
+`*            Theo D'Hondt           *`
+`*  VUB Programming Technology Lab   *`
+`*              (c)1997              *`
+`*-----------------------------------*`
+{ Empty: void;     
+  Eoln:  void;
+  False: void;
+  True:  void;
+  Void:  void;
+  
+  TAG_idx:  1;
+  
+  error@Lst:
+    { display(eoln, '***error*** ');
+      for(k: 1, k:= k+1, not(k > size(Lst)),
+          display(Lst[k]));
+      display(eoln);
+      Void };
+              
+  NBR_tag: 1;
+  NBR(Val):
+    [ NBR_tag, Val ];
+  NBR_VAL_idx: 2;
+
+  FRC_tag: 2;
+  FRC(Val): 
+    [ FRC_tag, Val ];
+  FRC_VAL_idx: 2;
+
+  TXT_tag: 3;
+  TXT(Val):
+    [ TXT_tag, Val ];
+  TXT_VAL_idx: 2;
+
+  TAB_tag: 4;
+  TAB(Tab):
+    [ TAB_tag, Tab ];
+  TAB_TAB_idx: 2;
+
+  FUN_tag: 5;
+  FUN(Nam, Par, Bod, Dct):
+    [ FUN_tag, Nam, Par, Bod, Dct ];
+  FUN_NAM_idx: 2;
+  FUN_PAR_idx: 3;
+  FUN_EXP_idx: 4;
+  FUN_DCT_idx: 5;
+
+  NAT_tag: 6;
+  NAT(Nam, Nat):
+    [ NAT_tag, Nam, Nat ];
+  NAT_Nam_idx: 2;
+  NAT_NAT_idx: 3;
+
+  VAR_tag: 7;
+  VAR(Nam):
+    [ VAR_tag, Nam ];
+  VAR_NAM_idx: 2;
+
+  APL_tag: 8;
+  APL(Nam, Arg):
+    [ APL_tag, Nam, Arg ];
+  APL_NAM_idx: 2;
+  APL_ARG_idx: 3;
+
+  TBL_tag: 9;
+  TBL(Nam, Idx):
+    [ TBL_tag, Nam, Idx ];
+  TBL_NAM_idx: 2;
+  TBL_IDX_idx: 3;
+
+  DEF_tag: 10;
+  DEF(Inv, Exp):
+    [ DEF_tag, Inv, Exp ];
+  DEF_INV_idx: 2;
+  DEF_EXP_idx: 3;
+
+  SET_tag: 11;
+  SET(Inv, Exp):
+    [ SET_tag, Inv, Exp ];
+  SET_INV_idx: 2;
+  SET_EXP_idx: 3;
+
+  DCT_tag: 12;
+  DCT(Nam, Val, Dct):
+    [ DCT_tag, Nam, Val, Dct ];
+  DCT_NAM_idx: 2;
+  DCT_VAL_idx: 3;
+  DCT_DCT_idx: 4;
+
+  VOI_tag: 13;
+  VOI():
+    [ VOI_tag ];
+
+  Empty:= TAB([]);
+  Eoln := TXT(eoln);
+  Void := VOI();
+
+  display('grammar installed', eoln) }

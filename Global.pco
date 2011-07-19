@@ -1,0 +1,287 @@
+`*-----------------------------------*`
+`*             >>>Pico<<<            *`
+`*            Theo D'Hondt           *`
+`*  VUB Programming Technology Lab   *`
+`*              (c)1997              *`
+`*-----------------------------------*`
+{make_global():
+   {TRUE_def:  'true(x(),y()):=x()';
+    FALSE_def: 'false(x(),y()):=y()';
+    AND_def:   'and(p,q()):p(q(),false)';
+    OR_def:    'or(p,q()):p(true,q())';
+    NOT_def:   'not(p):p(false,true)';
+    BEGIN_def: 'begin@t:t[size(t)]';
+    IF_def:    'if(c,t(),e()):c(t(),e())';
+    WHILE_def: 'while(c(),e()):{l(v,p):p(l(e(),c()),v);l(void,c())}';
+    UNTIL_def: 'until(c(),e()):{l(v,p):p(v,l(e(),c()));l(e(),c())}';
+    FOR_def:   'for(i,p(),c(),e()):while(c(),{v:e();p();v})';
+    TAB_def:   'tab@t:t';
+
+    def_tab: [TRUE_def, FALSE_def, AND_def, OR_def, 
+              NOT_def, BEGIN_def, IF_def, WHILE_def, 
+              UNTIL_def, FOR_def, TAB_def];
+
+    reify_NBR(Nbr):
+      if(Nbr[TAG_idx]=NBR_tag, 
+         Nbr[NBR_VAL_idx],
+         error('number required'));
+    
+    reify_NUM(Num):
+      if(Num[TAG_idx]=NBR_tag, 
+         Num[NBR_VAL_idx],
+         if(Num[TAG_idx]=FRC_tag,
+            Num[FRC_VAL_idx],
+            error('number or fraction required')));
+          
+    reify_TXT(Txt):
+      if(Txt[TAG_idx]=TXT_tag, 
+         Txt[TXT_VAL_idx],
+         error('text required'));
+
+    reify_TAB(Tab):
+      if(Tab[TAG_idx]=TAB_tag,
+         Tab[TAB_TAB_idx],
+         error('table required'));
+
+    deify_NBR(Nbr):
+      if(is_number(Nbr), 
+         NBR(Nbr), 
+         error('number required'));
+
+    deify_FRC(Frc):
+      if(is_fraction(Frc), 
+         FRC(Frc), 
+         error('number required'));
+
+    deify_NUM(Num):
+      if(is_number(Num), 
+         NBR(Num), 
+         if(is_fraction(Num),
+            FRC(Num),
+            error('number or fraction required')));
+
+    deify_TXT(Txt):
+      if(is_text(Txt), 
+         TXT(Txt), 
+         error('text value required'));
+
+    deify_TAB(Tab):
+      if(is_table(Tab),
+         TAB(Tab),
+         error('text value required'));
+
+    arg_0(Arg, Act()): 
+      {tab: reify_TAB(Arg);
+       if(size(tab)=0,
+          Act(),
+          error('no arguments allowed'))};
+
+    arg_1(Arg, Act(p)): 
+      {tab: reify_TAB(Arg);
+       if(size(tab)=1,
+          Act(eval(tab[1])),
+          error('1 argument required'))};
+
+    arg_1_2(Arg, Ac1(p), Ac2(p,q)): 
+      {tab: reify_TAB(Arg);
+       if(size(tab)=1,
+          Ac1(eval(tab[1])),
+          if(size(tab)=2,
+             Ac2(eval(tab[1]),eval(tab[2])),
+             error('1 or 2 arguments required')))};
+
+    arg_2(Arg, Act(p,q)): 
+      {tab: reify_TAB(Arg);
+       if(size(tab)=2,
+          Act(eval(tab[1]),eval(tab[2])),
+          error('2 arguments required'))};
+
+    size_1(Txt):
+      if(size(Txt)=1,
+         Txt,
+         {error('singe character expected'); ' '});
+
+    add_fun@Arg:
+      arg_1_2(Arg,
+              deify_NUM(+reify_NUM(p)),
+              if(and(p[TAG_idx]=TXT_tag, 
+                     q[TAG_idx]=TXT_tag),
+                 deify_TXT(reify_TXT(p)+reify_TXT(q)),
+                 deify_NUM(reify_NUM(p)+reify_NUM(q))));
+
+    sub_fun@Arg:
+      arg_1_2(Arg,
+              deify_NUM(-reify_NUM(p)),
+              deify_NUM(reify_NUM(p)-reify_NUM(q)));
+    
+    mul_fun@Arg:
+      arg_2(Arg,
+            deify_NUM(reify_NUM(p)*reify_NUM(q)));
+    
+    frc_div_fun@Arg: 
+      arg_2(Arg,
+            {num: reify_NUM(q);
+             if(num =0,
+                error('division by zero'),
+                deify_NUM(reify_NUM(p)/num))});
+    
+    int_div_fun(#):
+      fun@Arg: 
+        arg_2(Arg,
+              {nbr: reify_NBR(q);
+               if(nbr =0,
+                  error('division by zero'),
+                  deify_NBR(reify_NBR(p)#nbr))});
+    
+    exp_fun@Arg:
+      arg_2(Arg,
+            {num: reify_NUM(p);
+             if(num<0,
+                error('negative base number'),
+                deify_FRC(num^reify_NUM(q)))});
+
+    rel_fun(#):
+      fun@Arg:
+        arg_2(Arg, 
+              if(and(p[TAG_idx]=TXT_tag, 
+                     q[TAG_idx]=TXT_tag),
+                 if(reify_TXT(p)#reify_TXT(q), 
+                    True, False),
+                 if(reify_NUM(p)#reify_NUM(q),
+                    True, False)));
+    
+    trunc_fun@Arg:
+      arg_1(Arg,
+            deify_NBR(trunc(reify_NUM(p))));
+    
+    abs_fun@Arg:
+      arg_1(Arg,
+            deify_NUM(abs(reify_NUM(p))));
+    
+    char_fun@Arg:
+      arg_1(Arg,
+            {nbr: reify_NBR(p);
+             if(or(nbr<0, nbr>255),
+                error('invalid ordinal'),
+                deify_TXT(char(nbr)))});
+     
+    ord_fun@Arg:
+      arg_1(Arg,
+            deify_NBR(ord(size_1(reify_TXT(p)))));
+
+    number_fun@Arg:
+      arg_1(Arg,
+            {num: number(reify_TXT(p));
+             if(is_void(num),
+                Void,
+                deify_NUM(num))});
+      
+    transcendental_fun(Opr):
+      fun@Arg:
+        arg_1(Arg,
+              deify_FRC(Opr(reify_NUM(p))));
+    
+    explode_fun@Arg:
+      arg_1(Arg,
+            {c: explode(reify_TXT(p));
+             nbr: 0;
+             t[size(c)]: deify_TXT(c[nbr:=nbr+1]);
+             deify_TAB(t)});
+    
+    implode_fun@Arg:
+      arg_1(Arg, 
+            {t: reify_TAB(p);
+             nbr: 0;
+             c[size(t)]: size_1(reify_TXT(t[nbr:=nbr+1]));
+             deify_TXT(implode(c))});
+
+    type_fun(Tag):
+      fun@Arg:
+        arg_1(Arg,
+              if(p[TAG_idx]=Tag, True, False));
+         
+    fun_fun(Arg):
+      arg_1(Arg,
+            if(or(p[TAG_idx]=FUN_TAG,
+                  p[TAG_idx]=NAT_TAG), True, False));
+         
+    size_fun@Arg:
+      arg_1(Arg,
+            deify_NBR(size(reify_TAB(p))));
+
+    display_fun@Arg:
+      {tab: reify_TAB(Arg);
+       for(nbr: 1, nbr:=nbr+1, not(nbr > size(tab)),
+           print(eval(tab[nbr])));
+       Eoln};
+    
+    accept_fun@Arg:
+      arg_0(Arg, deify_TXT(accept()));
+    
+    nat_tab: ['+', '-', '*', '/', '//', '\\', '^', 
+              '<', '=', '>', 'trunc', 'abs', 'char', 
+              'ord', 'number', 'sqrt', 'sin', 'cos',
+              'tan', 'arcsin', 'arccos', 'arctan',  
+              'exp', 'log', 'explode', 'implode', 
+              'is_number', 'is_fraction', 'is_text', 
+              'is_function', 'is_table', 'is_void', 
+              'size', 'display','accept' ];
+
+    fun_tab: [add_fun,
+              sub_fun,
+              mul_fun,
+              frc_div_fun, 
+              int_div_fun(//),  
+              int_div_fun(\\),  
+              exp_fun,
+              rel_fun(<),
+              rel_fun(=),  
+              rel_fun(>), 
+              trunc_fun,
+              abs_fun,
+              char_fun, 
+              ord_fun,
+              number_fun,  
+              transcendental_fun(sqrt),
+              transcendental_fun(sin),  
+              transcendental_fun(cos), 
+              transcendental_fun(tan),
+              transcendental_fun(arcsin),
+              transcendental_fun(arccos),
+              transcendental_fun(arctan),   
+              transcendental_fun(exp),
+              transcendental_fun(log),  
+              explode_fun,  
+              implode_fun, 
+              type_fun(NBR_tag),
+              type_fun(FRC_tag),
+              type_fun(TXT_tag),
+              fun_fun,
+              type_fun(TAB_tag),
+              type_fun(VOI_tag),
+              size_fun,
+              display_fun,
+              accept_fun];
+
+      make_global():=
+        {global: make_dict();
+         for(idx: 1, idx:= idx+1,
+             not(idx > size(nat_tab)),
+             global:= add(nat_tab[idx], 
+                          NAT(nat_tab[idx], fun_tab[idx]),
+                          global));
+         global:= add('true' , Void, global);
+         global:= add('false', Void, global);
+         global:= add('eoln' , Eoln, global);
+         global:= add('void' , Void, global);
+         init_eval(global);
+         for(idx: 1, idx:= idx+1, 
+             not(idx > size(def_tab)),
+             eval(read(def_tab[idx])));
+         True := get('true', global);
+         False:= get('false', global);      
+         void};
+
+    make_global()};
+
+ display('global definitions installed', eoln)}

@@ -1,0 +1,48 @@
+`*-----------------------------------*`
+`*             >>>Pico<<<            *`
+`*            Theo D'Hondt           *`
+`*  VUB Programming Technology Lab   *`
+`*              (c)1997              *`
+`*-----------------------------------*`
+{ copy(Dct): 
+    error('dictionary not initialized');
+
+  add(Nam, Val, Dct):
+    error('dictionary not initialized');
+
+  get(Nam, Dct):
+    error('dictionary not initialized');
+
+  set(Nam, Val, Dct):
+    error('dictionary not initialized');
+
+  make_dict():
+    { copy(Dct):=
+        Dct;
+
+      add(Nam, Val, Dct):=
+        DCT(Nam, Val, Dct);
+
+      get(Nam, Dct):=
+        { while(not(or(equivalent(Dct, Void),
+                       Dct[DCT_NAM_idx] = Nam)),
+                Dct:= Dct[DCT_DCT_idx]);
+          if(equivalent(Dct, Void),
+             error(Nam, ' not found'),
+             Dct[DCT_VAL_idx])};
+
+      set(Nam, Val, Dct):=
+        { while(not(or(equivalent(Dct, Void),
+                       Dct[DCT_NAM_idx] = Nam)),
+                Dct:= Dct[DCT_DCT_idx]);
+          if(equivalent(Dct, Void),
+             error(Nam, ' not found'),
+             Dct[DCT_VAL_idx]:= Val); 
+          Void };
+
+      make_dict():=
+        Void;
+
+      make_dict() };
+
+  display('dictionary installed', eoln) }

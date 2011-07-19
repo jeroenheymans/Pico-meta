@@ -1,0 +1,16 @@
+`*-----------------------------------*`
+`*             >>>Pico<<<            *`
+`*            Theo D'Hondt           *`
+`*  VUB Programming Technology Lab   *`
+`*              (c)1997              *`
+`*-----------------------------------*`
+{ load("Grammar.pco");
+  load("Scan.pco"   );
+  load("Case.pco"   );
+  load("Read.pco"   );
+  load("Dict.pco"   );
+  load("Eval.pco"   );
+  load("Print.pco"  );
+  load("Global.pco" );
+  load("Pico.pco"   ) }
+

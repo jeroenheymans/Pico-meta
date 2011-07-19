@@ -1,0 +1,112 @@
+`*-----------------------------------*`
+`*             >>>Pico<<<            *`
+`*            Theo D'Hondt           *`
+`*  VUB Programming Technology Lab   *`
+`*              (c)1997              *`
+`*-----------------------------------*`
+{ print(Exp):
+    { indent: 0;
+       
+      print_expression(Exp):
+        void;
+
+      print_list(Lst, Ini, Sep, Trm):
+        { display(Ini);
+          if(size(Lst) > 0,
+             { print(Lst[1]);
+               for(k: 2, k:= k+1, not(k > size(Lst)),
+                   { display(Sep); 
+                     print_expression(Lst[k]) }) },
+             void);
+          display(Trm) };
+
+      print_number(Exp):
+        { val: Exp[NBR_VAL_idx];
+          display(val) };
+
+      print_fraction(Exp):
+        { val: Exp[FRC_VAL_idx];
+          display(val) };
+
+      print_text(Exp):
+        { val: Exp[TXT_VAL_idx];
+          display(val) };
+
+      print_table(Exp):
+        { tab: Exp[TAB_TAB_idx];
+          print_list(tab, '[', ',', ']') };
+
+      print_function(Exp):
+        { nam: Exp[FUN_NAM_idx];
+          display('<function ', nam, '>') };
+
+      print_native(Exp):
+        { nam: Exp[NAT_Nam_idx];
+          display('<native function ', nam, '>') };
+
+      print_void(Exp):
+        display('<void>');
+      
+      print_variable(Exp): 
+        { nam: Exp[VAR_NAM_idx];
+          display(nam) };
+            
+      print_application(Exp): 
+        { nam: Exp[APL_NAM_idx];
+          arg: Exp[APL_ARG_idx];
+          display(nam);
+          if(arg[TAG_idx] = TAB_tag,
+             { tab: arg[TAB_TAB_idx];
+               print_list(tab, '(', ',', ')') },
+             { display('@');
+               print_expression(arg) })};
+            
+      print_tabulation(Exp): 
+        { nam: Exp[TBL_NAM_idx];
+          idx: Exp[TBL_IDX_idx];
+          display(nam, '[');
+          print_expression(idx);
+          display(']') };
+            
+      print_definition(Exp): 
+        { inv: Exp[DEF_INV_idx];
+          exp: Exp[DEF_EXP_idx];
+          print_expression(inv);
+          display(': ');
+          print_expression(exp) };
+            
+      print_assignment(Exp): 
+        { inv: Exp[SET_INV_idx];
+          exp: Exp[SET_EXP_idx];
+          print_expression(inv);
+          display(':= ');
+          print_expression(exp) };
+            
+      print_dictionary(Exp): 
+        display('<dictionary>');
+            
+      exp_case: case(NBR_tag => print_number,
+                     FRC_tag => print_fraction,
+                     TXT_tag => print_text,
+                     TAB_tag => print_table,
+                     FUN_tag => print_function,
+                     NAT_tag => print_native,
+                     VAR_tag => print_variable,
+                     APL_tag => print_application,
+                     TBL_tag => print_tabulation,
+                     DEF_tag => print_definition,
+                     SET_tag => print_assignment,
+                     DCT_tag => print_dictionary,
+                     VOI_tag => print_void);
+      
+      print_expression(Exp):=
+        { cas: exp_case(Exp[TAG_idx]);
+          cas(Exp) };
+      
+      print(Exp):=
+        { indent:= 0;
+          print_expression(Exp) };
+      
+      print(Exp) };
+
+  display('printer installed', eoln)}

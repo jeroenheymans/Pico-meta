@@ -1,0 +1,229 @@
+`*-----------------------------------*`
+`*             >>>Pico<<<            *`
+`*            Theo D'Hondt           *`
+`*  VUB Programming Technology Lab   *`
+`*              (c)1997              *`
+`*-----------------------------------*`
+{ eval(Exp):
+    error('evaluator not initialized');
+        
+  init_eval(Dct):
+    { DCT: Dct;
+
+      eval_variable(Exp):
+        { nam: Exp[VAR_NAM_idx];
+          get(nam, DCT) };
+
+      call_function(Exp, Dct):
+        { dct: DCT;
+          DCT:= Dct;
+          val: eval(Exp);
+          DCT:= dct;
+          val };
+
+      bind_variable(Exp, Var, Dct):
+        { nam: Var[VAR_NAM_idx];
+          val: eval(Exp);
+          add(nam, val, Dct) };
+
+      bind_application(Exp, Apl, Dct):
+        { nam: Apl[APL_NAM_idx];
+          arg: Apl[APL_ARG_idx]; 
+          fun: FUN(nam, arg, Exp, DCT);
+          add(nam, fun, Dct) };
+
+      bind_error(Tab, Err, Dct):
+        error('illegal parameter');
+   
+      bind_case: case(VAR_tag => bind_variable,
+                      APL_tag => bind_application,
+                         else => bind_error);
+  
+      call_table(TbA, TbP, Dct):
+        { tbA: TbA[TAB_TAB_idx];
+          tbP: TbP[TAB_TAB_idx];
+          siz: size(tbA);
+          if(siz = size(tbP),
+             for(k: 1, k:= k+1, not(k > siz),
+                 { arg: tbA[k];
+                   par: tbP[k];
+                   tag: par[TAG_idx];
+                   cas: bind_case(tag);
+                   Dct:= cas(arg, par, Dct) }),
+             error('Illegal argument count'));
+          Dct };
+
+      call_variable(Tab, Var, Dct):
+        { nam: Var[VAR_NAM_idx];
+          tab: Tab[TAB_TAB_idx];
+          siz: size(tab);
+          exp: if(siz > 0,
+                  { idx: 0;
+                    arg[siz]: eval(tab[idx:= idx+1]);
+                    TAB(arg) },
+                  Empty);
+          add(nam, exp, Dct) };
+   
+      call_error(Tab, Apl, Dct):
+        error('illegal parameter');
+   
+      call_case: case(TAB_tag => call_table,
+                      VAR_tag => call_variable,
+                         else => call_error);
+  
+      eval_call(Fun, Tab):
+        { par: Fun[FUN_PAR_idx];
+          exp: Fun[FUN_EXP_idx];
+          dct: Fun[FUN_DCT_idx];
+          tag: par[TAG_idx];
+          cas: call_case(tag);
+          dct:= cas(Tab, par, dct);
+          call_function(exp, dct) };
+
+      eval_application(Exp):
+        { nam: Exp[APL_NAM_idx];
+          arg: Exp[APL_ARG_idx];
+          exp: get(nam, DCT);
+          if(exp[TAG_idx] = FUN_tag,
+             if(arg[TAG_idx] = TAB_tag,
+                eval_call(exp, arg),
+                { val: eval(arg);
+                  if(val[TAG_idx] = TAB_tag,
+                     eval_call(exp, val),
+                     error('illegal argument')) }),
+             if(exp[TAG_idx] = NAT_tag,
+                { nat: exp[NAT_NAT_idx]; 
+                  nat@arg },
+                error('(native) function required'))) };
+
+      eval_tabulation(Exp):
+        { nam: Exp[TBL_NAM_idx];
+          exp: get(nam, DCT);
+          if(exp[TAG_idx] = TAB_tag,
+             { idx: Exp[TBL_IDX_idx];
+               val: eval(idx);
+               if(val[TAG_idx] = NBR_tag,
+                  { nbr: val[NBR_VAL_idx];
+                    if(nbr > 0, 
+                       { tab: exp[TAB_TAB_idx];
+                         if(nbr > size(tab),
+                            error('index beyond size'),
+                            tab[nbr]) },
+                       error('non-positive index')) },
+                  error('invalid index')) },
+             error('table required')) };
+
+      define_variable(Var, Exp):
+        { nam: Var[VAR_NAM_idx];
+          val: eval(Exp);
+          DCT:= add(nam, val, DCT);
+          val };
+    
+      define_application(Apl, Exp):
+        { nam: Apl[APL_NAM_idx];
+          arg: Apl[APL_ARG_idx];
+          DCT:= add(nam, Void, DCT);
+          fun: FUN(nam, arg, Exp, DCT);
+          set(nam, fun, DCT);
+          fun };
+    
+      define_tabulation(Tbl, Exp):
+        { nam: Tbl[TBL_NAM_idx];
+          idx: Tbl[TBL_IDX_idx];
+          val: eval(idx);
+          if(val[TAG_idx] = NBR_tag,
+             { nbr: val[NBR_VAL_idx];
+               if(nbr < 0,
+                  error('negative size'),
+                  { exp: if(nbr > 0,
+                            { tab[nbr]: eval(Exp);
+                              TAB(tab) },
+                            Empty );
+                    DCT:= add(nam, exp, DCT);
+                    exp }) },
+             error('invalid size')) }; 
+   
+      define_error(Inv, Exp):
+         error('invocation required');
+  
+      define_case: case(VAR_tag => define_variable,
+                        APL_tag => define_application,
+                        TBL_tag => define_tabulation,
+                           else => define_error);
+  
+      eval_definition(Exp):
+        { inv: Exp[DEF_INV_idx];
+          exp: Exp[DEF_EXP_idx];
+          tag: inv[TAG_idx];
+          cas: define_case(tag);
+          cas(inv, exp) };
+
+      assign_variable(Var, Exp):
+        { nam: Var[VAR_NAM_idx];
+          val: eval(Exp);
+          set(nam, val, DCT);
+          val };
+    
+      assign_application(Apl, Exp):
+        { nam: Apl[APL_NAM_idx];
+          arg: Apl[APL_ARG_idx];
+          fun: FUN(nam, arg, Exp, DCT);
+          set(nam, fun, DCT);
+          fun };
+    
+      assign_tabulation(Tbl, Exp):
+        { nam: Tbl[TBL_NAM_idx];
+          exp: get(nam, DCT);
+          if(exp[TAG_idx] = TAB_tag,
+             { idx: Tbl[TBL_IDX_idx];
+               val: eval(idx);
+               if(val[TAG_idx] = NBR_tag,
+                  { nbr: val[NBR_VAL_idx];
+                    if(nbr > 0, 
+                       { tab: exp[TAB_TAB_idx];
+                         if(nbr > size(tab),
+                            error('index beyond size'),
+                            { tab[nbr]:= eval(Exp);
+                              exp }) },
+                       error('non-positive index')) },
+                  error('invalid index')) },
+             error('table required')) };
+   
+      assign_error(Inv, Exp):
+         error('invocation required');
+  
+      assign_case: case(VAR_tag => assign_variable,
+                        APL_tag => assign_application,
+                        TBL_tag => assign_tabulation,
+                           else => assign_error);
+  
+      eval_assignment(Exp):
+        { inv: Exp[SET_INV_idx];
+          exp: Exp[SET_EXP_idx];
+          tag: inv[TAG_idx];
+          cas: assign_case(tag);
+          cas(inv, exp) };
+    
+      eval_identity(Exp):
+        Exp;
+    
+      eval_case: case(VAR_tag => eval_variable,
+                      APL_tag => eval_application,
+                      TBL_tag => eval_tabulation,
+                      DEF_tag => eval_definition,
+                      SET_tag => eval_assignment,
+                         else => eval_identity);
+  
+      init_eval(Dct):=
+        { DCT:= Dct;
+          void };
+
+      eval(Exp):=
+        { tag: Exp[TAG_idx];
+          cas: eval_case(tag);
+          cas(Exp) };
+  
+      void };
+
+  display('evaluator installed', eoln) }
+
