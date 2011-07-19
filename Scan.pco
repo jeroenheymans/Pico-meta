@@ -64,42 +64,44 @@
       rpr: 24;
       smc: 25;
       wsp: 26;
-      xop: 27;
+      pow: 27; `power`
+      exc: 28; `exclamation mark`
+      que: 29; `question mark`
 
-      siz: 27;
+      siz: 29; `+2 because of adding exc and que`
         
-      ch_tab: [`end` wsp, wsp, wsp, wsp, wsp, wsp, wsp, 
-                wsp, wsp, wsp, wsp, wsp, eol, wsp, wsp, 
-                wsp, wsp, wsp, wsp, wsp, wsp, wsp, wsp, 
-                wsp, wsp, wsp, wsp, wsp, wsp, wsp, wsp, 
-                wsp, xop, quo, rop, aop, aop, mop, apo, 
-                lpr, rpr, mop, pls, com, mns, per, mop, 
-                dgt, dgt, dgt, dgt, dgt, dgt, dgt, dgt, 
-                dgt, dgt, col, smc, rop, eql, rop, xop, 
-                cat, ltr, ltr, ltr, ltr, exp, ltr, ltr, 
-                ltr, ltr, ltr, ltr, ltr, ltr, ltr, ltr, 
-                ltr, ltr, ltr, ltr, ltr, ltr, ltr, ltr, 
-                ltr, ltr, ltr, lbr, mop, rbr, xop, ltr, 
-                ill, ltr, ltr, ltr, ltr, exp, ltr, ltr, 
-                ltr, ltr, ltr, ltr, ltr, ltr, ltr, ltr, 
-                ltr, ltr, ltr, ltr, ltr, ltr, ltr, ltr, 
-                ltr, ltr, ltr, lbc, aop, rbc, aop, ill, 
-                ill, ill, ill, ill, ill, ill, ill, ill, 
-                ill, ill, ill, ill, ill, ill, ill, ill, 
-                ill, ill, ill, ill, ill, ill, ill, ill,       
-                ill, ill, ill, ill, ill, ill, ill, ill, 
-                ill, ill, ill, ill, ill, ill, ill, ill, 
-                ill, ill, ill, ill, ill, ill, ill, ill, 
-                ill, ill, ill, ill, ill, ill, ill, ill, 
-                ill, ill, ill, ill, ill, ill, ill, ill, 
-                ill, ill, ill, ill, ill, ill, ill, ill, 
-                ill, ill, ill, ill, ill, ill, ill, ill, 
-                ill, ill, ill, ill, ill, ill, ill, ill, 
-                ill, ill, ill, ill, ill, ill, ill, ill, 
-                ill, ill, ill, ill, ill, ill, ill, ill, 
-                ill, ill, ill, ill, ill, ill, ill, ill, 
-                ill, ill, ill, ill, ill, ill, ill, ill, 
-                ill, ill, ill, ill, ill, ill, ill, ill ];
+      ch_tab: [`end` wsp, wsp, wsp, wsp, wsp, wsp, wsp, `7`
+                wsp, wsp, wsp, wsp, wsp, eol, wsp, wsp, `15`
+                wsp, wsp, wsp, wsp, wsp, wsp, wsp, wsp, `23`
+                wsp, wsp, wsp, wsp, wsp, wsp, wsp, wsp, `31`
+                wsp, exc, quo, rop, aop, aop, mop, apo, `39`
+                lpr, rpr, mop, pls, com, mns, per, mop, `47`
+                dgt, dgt, dgt, dgt, dgt, dgt, dgt, dgt, `55`
+                dgt, dgt, col, smc, rop, eql, rop, que, `63`
+                cat, ltr, ltr, ltr, ltr, exp, ltr, ltr, `71`
+                ltr, ltr, ltr, ltr, ltr, ltr, ltr, ltr, `79`
+                ltr, ltr, ltr, ltr, ltr, ltr, ltr, ltr, `87`
+                ltr, ltr, ltr, lbr, mop, rbr, pow, ltr, `95`
+                ill, ltr, ltr, ltr, ltr, exp, ltr, ltr, `103`
+                ltr, ltr, ltr, ltr, ltr, ltr, ltr, ltr, `111`
+                ltr, ltr, ltr, ltr, ltr, ltr, ltr, ltr, `119`
+                ltr, ltr, ltr, lbc, aop, rbc, aop, ill, `127`
+                ill, ill, ill, ill, ill, ill, ill, ill, `135`
+                ill, ill, ill, ill, ill, ill, ill, ill, `143`
+                ill, ill, ill, ill, ill, ill, ill, ill, `151`
+                ill, ill, ill, ill, ill, ill, ill, ill, `159`
+                ill, ill, ill, ill, ill, ill, ill, ill, `167`
+                ill, ill, ill, ill, ill, ill, ill, ill, `175`
+                ill, ill, ill, ill, ill, ill, ill, ill, `183`
+                ill, ill, ill, ill, ill, ill, ill, ill, `191`
+                ill, ill, ill, ill, ill, ill, ill, ill, `199`
+                ill, ill, ill, ill, ill, ill, ill, ill, `207`
+                ill, ill, ill, ill, ill, ill, ill, ill, `215`
+                ill, ill, ill, ill, ill, ill, ill, ill, `223`
+                ill, ill, ill, ill, ill, ill, ill, ill, `231`
+                ill, ill, ill, ill, ill, ill, ill, ill, `239`
+                ill, ill, ill, ill, ill, ill, ill, ill, `247`
+                ill, ill, ill, ill, ill, ill, ill, ill ];`255`
              
       input: void;
       pos: 0;
@@ -154,7 +156,7 @@
       eql_allowed: mask(eql);
       exp_allowed: mask(exp);
       nam_allowed: mask(dgt,exp,ltr);
-      opr_allowed: mask(aop,eql,mns,mop,pls,rop,xop);
+      opr_allowed: mask(aop,eql,mns,mop,pls,rop,pow,exc,que); `xop = pow,exc,que`
       per_allowed: mask(per);
       quo_allowed: mask(quo);
       qux_allowed: mask(eol,quo);
@@ -298,7 +300,9 @@
                  rpr_fun,
                  smc_fun,
                  wsp_fun,
-                 xop_fun ];
+                 xop_fun,  `since we've split the xop up in pow,exc and que,`
+                 xop_fun,  `we need to capture this here so an xop is still`
+                 xop_fun ];`handled correctly`
 
                  
       init_scan(Str):=
