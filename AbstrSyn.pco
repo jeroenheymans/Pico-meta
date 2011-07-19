@@ -31,6 +31,10 @@
 ` <definition>  ::= DEF <invocation> <expression>                `
 ` <assignment>  ::= SET <invocation> <expression>                `
 ` <dictionary>  ::= DCT <identifier> <expression> <dictionary>   `
+` <thread>      ::= THR <number> <expression> <continuation>     `
+` <threadid>    ::= TID <number>                                 `
+` <threadreq>   ::= THQ <invocation> <arguments>                 `
+` <threadans>   ::= THA <invocation> <arguments>                 `
 ` <void>        ::= VOI                                          `
 `                                                                `
 ` <identifier>  ::= <text>                                       `
