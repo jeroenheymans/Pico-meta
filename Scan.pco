@@ -57,22 +57,24 @@
       rpr: 24;
       smc: 25;
       wsp: 26;
-      xop: 27;
+      pow: 27;
+      exc: 28;
+      que: 29;
 
-      siz: 27;
+      siz: 29;
         
       ch_tab: [`end` wsp, wsp, wsp, wsp, wsp, wsp, wsp, 
                 wsp, wsp, wsp, wsp, wsp, eol, wsp, wsp, 
                 wsp, wsp, wsp, wsp, wsp, wsp, wsp, wsp, 
                 wsp, wsp, wsp, wsp, wsp, wsp, wsp, wsp, 
-                wsp, xop, quo, rop, aop, aop, mop, apo, 
+                wsp, exc, quo, rop, aop, aop, mop, apo, 
                 lpr, rpr, mop, pls, com, mns, per, mop, 
                 dgt, dgt, dgt, dgt, dgt, dgt, dgt, dgt, 
-                dgt, dgt, col, smc, rop, eql, rop, xop, 
+                dgt, dgt, col, smc, rop, eql, rop, que, 
                 cat, ltr, ltr, ltr, ltr, exp, ltr, ltr, 
                 ltr, ltr, ltr, ltr, ltr, ltr, ltr, ltr, 
                 ltr, ltr, ltr, ltr, ltr, ltr, ltr, ltr, 
-                ltr, ltr, ltr, lbr, mop, rbr, xop, ltr, 
+                ltr, ltr, ltr, lbr, mop, rbr, pow, ltr, 
                 ill, ltr, ltr, ltr, ltr, exp, ltr, ltr, 
                 ltr, ltr, ltr, ltr, ltr, ltr, ltr, ltr, 
                 ltr, ltr, ltr, ltr, ltr, ltr, ltr, ltr, 
@@ -147,7 +149,7 @@
       eql_allowed: mask(eql);
       exp_allowed: mask(exp);
       nam_allowed: mask(dgt,exp,ltr);
-      opr_allowed: mask(aop,eql,mns,mop,pls,rop,xop);
+      opr_allowed: mask(aop,eql,mns,mop,pls,rop,pow,exc,que);
       per_allowed: mask(per);
       quo_allowed: mask(quo);
       qux_allowed: mask(eol,quo);
@@ -291,6 +293,8 @@
                  rpr_fun,
                  smc_fun,
                  wsp_fun,
+                 xop_fun,
+                 xop_fun,
                  xop_fun ];
 
                  
