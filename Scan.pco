@@ -117,6 +117,10 @@
       next_ch(Tkn):
         { skip_ch();
           Tkn };
+
+      prev_ch(Tkn):
+         { ch:=if(pos = 0,0,ord(input[pos:=pos-1]));
+           Tkn };
                 
       freeze():
         hold:= pos;
@@ -162,6 +166,8 @@
       que_allowed: mask(que);
       quo_allowed: mask(quo);
       qux_allowed: mask(eol,quo);
+      rbc_allowed: mask(rbc);
+      rpr_allowed: mask(rpr);
       sgn_allowed: mask(pls,mns);
       wsp_allowed: mask(wsp,eol);
         
@@ -211,7 +217,21 @@
         { skip_ch();
           if(check(eql_allowed),
              next_ch(CEQ_token),
-             COL_token) };
+             if(check(rpr_allowed),
+                next_ch(THR_token),
+                if(check(rbc_allowed),
+                   next_ch(TSR_token),
+                   if(check(que_allowed),
+                      { skip_ch();
+                        if(check(col_allowed),
+                           next_ch(THQ_token),
+                           prev_ch(COL_token)) },
+                      if(check(exc_allowed),
+                         { skip_ch();
+                           if(check(col_allowed),
+                              next_ch(THA_token),
+                              prev_ch(COL_token)) },
+                          COL_token)))))};
           
       com_fun():  
         next_ch(COM_token);
