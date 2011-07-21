@@ -250,13 +250,19 @@
           END_token };
           
       lbc_fun():  
-        next_ch(LBC_token);
+        { skip_ch(); 
+          if(check(col_allowed),
+             next_ch(TSL_token),
+             LBC_token) };
           
       lbr_fun():  
         next_ch(LBR_token);
           
       lpr_fun(): 
-        next_ch(LPR_token);
+        { skip_ch();
+          if(check(col_allowed),
+             next_ch(THL_token),
+             LPR_token) };
           
       ltr_fun():
         { freeze();
