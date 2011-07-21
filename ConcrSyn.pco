@@ -10,6 +10,8 @@
 ` <expression>    ::= <invocation>                               `
 ` <expression>    ::= <invocation> :  <expression>               `
 ` <expression>    ::= <invocation> := <expression>               `
+` <expression>    ::= <invocation> :?: <application>             `
+` <expression>    ::= <invocation> :!: <application>             `
 `                                                                `
 ` <invocation>    ::= <comparand>                                `
 ` <invocation>    ::= <invocation> <comparator> <comparand>      `

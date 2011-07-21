@@ -203,6 +203,15 @@
           tag: inv[TAG_idx];
           cas: assign_case(tag);
           cas(inv, exp) };
+
+      eval_thread(Exp):
+        Exp;
+    
+      eval_thread_question(Exp):
+        Exp;
+    
+      eval_thread_answer(Exp):
+        Exp;
     
       eval_identity(Exp):
         Exp;
@@ -212,6 +221,9 @@
                       TBL_tag => eval_tabulation,
                       DEF_tag => eval_definition,
                       SET_tag => eval_assignment,
+                      THR_tag => eval_thread,
+                      THQ_tag => eval_thread_question,
+                      THA_tag => eval_thread_answer,
                          else => eval_identity);
   
       init_eval(Dct):=

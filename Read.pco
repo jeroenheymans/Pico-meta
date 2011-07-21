@@ -187,8 +187,16 @@
       assignment(Inv): 
         SET(next(Inv), expression());
 
+      thread_answer(Inv):
+        THA(Inv, void, void);
+
+      thread_question(Inv):
+        THQ(Inv, void, void);
+
       exp_case: case(COL_token => definition,
                      CEQ_token => assignment,
+                     THA_token => thread_answer,
+                     THQ_token => thread_question,
                           else => identity);
 
       expression():= 

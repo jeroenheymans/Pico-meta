@@ -93,6 +93,35 @@
   VOI():
     [ VOI_tag ];
 
+  THR_tag: 14;
+  THR(Tid, Exp, Dct):
+    [ THR_tag, Tid, Exp, Dct, void, void ];
+  THR_TID_idx: 2;
+  THR_EXP_idx: 3;
+  THR_DCT_idx: 4;
+  THR_CNT_idx: 5;
+  THR_BUF_idx: 6;
+
+  THQ_tag: 15;
+  THQ(Inv, Nam, Arg):
+    [ THQ_tag, Inv, Nam, Arg ];
+  THQ_INV_idx: 2;
+  THQ_NAM_idx: 3;
+  THQ_ARG_idx: 4;
+
+  THA_tag: 16;
+  THA(Inv, Nam, Arg):
+    [ THA_tag, Inv, Nam, Arg ];
+  THA_INV_idx: 2;
+  THA_NAM_idx: 3;
+  THA_ARG_idx: 4;
+
+  TID_tag: 17;
+  TID(Tid):
+    [ TID_tag, Tid ];
+  TID_TID_idx: 2;
+
+
   Empty:= TAB([]);
   Eoln := TXT(eoln);
   Void := VOI();

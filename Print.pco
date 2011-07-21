@@ -84,6 +84,15 @@
             
       print_dictionary(Exp): 
         display('<dictionary>');
+
+      print_thread(Exp): 
+        display('<thread>');
+
+      print_thread_question(Exp): 
+        display('<thread_question>');
+
+      print_thread_answer(Exp): 
+        display('<thread_answer>');
             
       exp_case: case(NBR_tag => print_number,
                      FRC_tag => print_fraction,
@@ -97,6 +106,9 @@
                      DEF_tag => print_definition,
                      SET_tag => print_assignment,
                      DCT_tag => print_dictionary,
+                     THR_tag => print_thread,
+                     THQ_tag => print_thread_question,
+                     THA_tag => print_thread_answer,
                      VOI_tag => print_void);
       
       print_expression(Exp):=
