@@ -27,7 +27,13 @@
                  'right parenthesis',
                  'semicolon',
                  'text',
-                 'exponentiation operator' ];
+                 'exponentiation operator',
+                 'left thread parenthesis',
+                 'right thread parenthesis',
+                 'left thread brace',
+                 'right thread brace',
+                 'thread answer',
+                 'thread question' ];
                                                            
       message@any:
         error('Unexpected ', msg_tab[token]);

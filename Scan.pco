@@ -24,10 +24,10 @@
   SMC_token: 18; 
   TXT_token: 19;
   XOP_token: 20;
-  THR_token: 21; `(:`
-  THL_token: 22; `:)`
-  TSR_token: 23; `{:`
-  TSL_token: 24; `:}`
+  THL_token: 21; `(:`
+  THR_token: 22; `:)`
+  TSL_token: 23; `{:`
+  TSR_token: 24; `:}`
   THA_token: 25; `:!:`
   THQ_token: 26; `:?:`
   
