@@ -86,7 +86,7 @@
         display('<dictionary>');
 
       print_thread(Exp): 
-        display('<thread>');
+        display('<thread ',print_expression(Exp[THR_EXP_idx]),'>');
 
       print_thread_question(Exp): 
         display('<thread_question>');

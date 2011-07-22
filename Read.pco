@@ -150,6 +150,17 @@
              APL(tab_str, next(Empty)),
              APL(tab_str, list(COM_token, RBR_token))) };
 
+      thread():
+        { skip();
+          exp: expression();
+          if(token = THR_token, skip(), message());
+          THR(void, exp, void) };
+
+      thread_sequence():
+        { skip();
+          apl: APL(begin_str, list(SMC_token, TSR_token));
+          THR(void, apl, void) };
+
       ref_case: case(NBR_token => number,
                      FRC_token => fraction,
                      TXT_token => text,
@@ -161,6 +172,8 @@
                      LPR_token => parentheses,
                      LBC_token => braces,
                      LBR_token => brackets,
+                     THL_token => thread,
+                     TSL_token => thread_sequence,
                           else => message);
       reference():=
         { cas: ref_case(token); 
@@ -188,10 +201,18 @@
         SET(next(Inv), expression());
 
       thread_answer(Inv):
-        THA(Inv, void, void);
+        { var: next(scan_data);
+          if(token = LPR_token, skip(), message());
+          if(token = RPR_token,
+             THA(Inv, var, next(Empty)),
+             THA(Inv, var, list(COM_token, RPR_token))) };
 
       thread_question(Inv):
-        THQ(Inv, void, void);
+        { var: next(scan_data);
+          if(token = LPR_token, skip(), message());
+          if(token = RPR_token,
+             THQ(Inv, var, next(Empty)),
+             THQ(Inv, var, list(COM_token, RPR_token))) };
 
       exp_case: case(COL_token => definition,
                      CEQ_token => assignment,
