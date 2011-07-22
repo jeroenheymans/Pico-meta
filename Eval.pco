@@ -10,7 +10,7 @@
   init_eval(Dct):
     { DCT: Dct;
 
-      THL: void;
+      THL_ALL: void;
       THL_CUR: void;
       THL_CTR: 0;
 
@@ -30,6 +30,18 @@
                  found: true,
                   thl:= thl[THL_THL_idx]) };
           if(is_void(thl), error('Thread not found'), thl) };
+
+      thl_add_thr(thr):
+        { thr[THR_TID_idx]:= NBR(THL_CTR:= THL_CTR+1);
+          if(is_thl_cur_set(),
+             THL_ALL:= THL(thr,THL_ALL);
+             THL_ALL:= THL_CUR:= THL(thr,THL_ALL));
+          thr[THR_TID_idx] };
+
+      thl_nxt():
+        { nxt: THL_CUR[THL_THL_idx];
+          if(is_void(nxt), THL_CUR:=THL_ALL, THL_CUR:=nxt);
+          THL_CUR };
 
       oldCall: call;
       oldContinue: continue;
