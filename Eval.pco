@@ -28,13 +28,13 @@
               thr_tid: thr[THR_TID_idx];
               if(thr_tid[NBR_VAL_idx] = thf_tid[NBR_VAL_idx],
                  found: true,
-                  thl:= thl[THL_THL_idx]) };
+                  thl:= thl[THL_THL_idx]) });
           if(is_void(thl), error('Thread not found'), thl) };
 
       thl_add_thr(thr):
         { thr[THR_TID_idx]:= NBR(THL_CTR:= THL_CTR+1);
           if(is_thl_cur_set(),
-             THL_ALL:= THL(thr,THL_ALL);
+             THL_ALL:= THL(thr,THL_ALL),
              THL_ALL:= THL_CUR:= THL(thr,THL_ALL));
           thr[THR_TID_idx] };
 

@@ -38,8 +38,9 @@
       message@any:
         error('Unexpected ', msg_tab[token]);
           
-      skip():
+      skip(): {
         token:= scan();
+        error('Token: ',token) };
         
       next(Dat):
         { skip();
@@ -175,6 +176,7 @@
                      THL_token => thread,
                      TSL_token => thread_sequence,
                           else => message);
+
       reference():=
         { cas: ref_case(token); 
           cas() };
@@ -202,11 +204,11 @@
 
       thread_answer(Inv):
         { var: next(scan_data);
-			display("THREAD_ANSWER");
-          if(token = LPR_token, { display("LPR_token"); skip() }, message());
+			error("THREAD_ANSWER");
+          if(token = LPR_token, { error("LPR_token"); skip() }, message());
           if(token = RPR_token,
-             THA(Inv, var, next(Empty)),
-             THA(Inv, var, list(COM_token, RPR_token))) };
+             { error("RPR_token"); THA(Inv, var, next(Empty)) },
+             { error("NO LPR OR RPR"); THA(Inv, var, list(COM_token, RPR_token)) }) };
 
       thread_question(Inv):
         { var: next(scan_data);
