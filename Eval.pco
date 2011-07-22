@@ -10,6 +10,11 @@
   init_eval(Dct):
     { DCT: Dct;
 
+      oldCall: call;
+      oldContinue: continue;
+      continue(cnt, val):= { DCT:= cnt[2]; oldContinue(cnt[1], val) };
+      call(exp(cont)):= oldCall(exp([cont, DCT])); 
+
       eval_variable(Exp):
         { nam: Exp[VAR_NAM_idx];
           get(nam, DCT) };
@@ -59,7 +64,7 @@
           siz: size(tab);
           exp: if(siz > 0,
                   { idx: 0;
-                    arg[siz]: eval(tab[idx:= idx+1]);
+                    arg[siz]: eval(tab[idx: idx+1]);
                     TAB(arg) },
                   Empty);
           add(nam, exp, Dct) };

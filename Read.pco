@@ -202,7 +202,8 @@
 
       thread_answer(Inv):
         { var: next(scan_data);
-          if(token = LPR_token, skip(), message());
+			display("THREAD_ANSWER");
+          if(token = LPR_token, { display("LPR_token"); skip() }, message());
           if(token = RPR_token,
              THA(Inv, var, next(Empty)),
              THA(Inv, var, list(COM_token, RPR_token))) };
