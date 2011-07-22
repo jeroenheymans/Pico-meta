@@ -225,7 +225,7 @@
               'exp', 'log', 'explode', 'implode', 
               'is_number', 'is_fraction', 'is_text', 
               'is_function', 'is_table', 'is_void', 
-              'size', 'display','accept' ];
+              'size', 'display','accept', 'is_thread' ];
 
     fun_tab: [add_fun,
               sub_fun,
@@ -261,7 +261,8 @@
               type_fun(VOI_tag),
               size_fun,
               display_fun,
-              accept_fun];
+              accept_fun,
+              type_fun(THR_tag)];
 
       make_global():=
         {global: make_dict();
