@@ -121,6 +121,11 @@
     [ TID_tag, Tid ];
   TID_TID_idx: 2;
 
+  THL_tag: 18;
+  THL(Thr, Thl):
+    [ THL_tag, Thr, Thl ];
+  THL_THR_idx: 2;
+  THL_THL_idx: 3;
 
   Empty:= TAB([]);
   Eoln := TXT(eoln);

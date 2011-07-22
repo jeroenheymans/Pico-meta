@@ -10,6 +10,27 @@
   init_eval(Dct):
     { DCT: Dct;
 
+      THL: void;
+      THL_CUR: void;
+      THL_CTR: 0;
+
+      is_thl_cur_set(): not(is_void(THL_CUR));
+
+      set_thl_cur(Thr): THL_CUR:= Thr;
+
+      thl_find(thf):
+        { thl: THL;
+          thr: void;
+          found: false;
+          thf_tid: thf[THR_TID_idx];
+          while(and(not(found), not(is_void(thl))),
+            { thr:= thl[THL_THR_idx];
+              thr_tid: thr[THR_TID_idx];
+              if(thr_tid[NBR_VAL_idx] = thf_tid[NBR_VAL_idx],
+                 found: true,
+                  thl:= thl[THL_THL_idx]) };
+          if(is_void(thl), error('Thread not found'), thl) };
+
       oldCall: call;
       oldContinue: continue;
       continue(cnt, val):= { DCT:= cnt[2]; oldContinue(cnt[1], val) };
