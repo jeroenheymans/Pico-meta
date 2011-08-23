@@ -173,8 +173,8 @@
                      LPR_token => parentheses,
                      LBC_token => braces,
                      LBR_token => brackets,
-                     THL_token => thread,
-                     TSL_token => thread_sequence,
+                     LTH_token => thread,
+                     LTS_token => thread_sequence,
                           else => message);
 
       reference():=
@@ -204,11 +204,10 @@
 
       thread_answer(Inv):
         { var: next(scan_data);
-			error("THREAD_ANSWER");
-          if(token = LPR_token, { error("LPR_token"); skip() }, message());
+          if(token = LPR_token, skip(), message());
           if(token = RPR_token,
-             { error("RPR_token"); THA(Inv, var, next(Empty)) },
-             { error("NO LPR OR RPR"); THA(Inv, var, list(COM_token, RPR_token)) }) };
+             THA(Inv, var, next(Empty)),
+             THA(Inv, var, list(COM_token, RPR_token))) };
 
       thread_question(Inv):
         { var: next(scan_data);
