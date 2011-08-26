@@ -28,19 +28,18 @@
                  'semicolon',
                  'text',
                  'exponentiation operator',
-                 'left thread parenthesis',
-                 'right thread parenthesis',
-                 'left thread brace',
-                 'right thread brace',
-                 'thread answer',
-                 'thread question' ];
+                 'left thread',
+                 'right thread',
+                 'left thread sequence',
+                 'right thread sequence',
+                 'thread request',
+                 'thread answer' ];
                                                            
       message@any:
         error('Unexpected ', msg_tab[token]);
           
-      skip(): {
+      skip():
         token:= scan();
-        error('Token: ',token) };
         
       next(Dat):
         { skip();
@@ -151,15 +150,15 @@
              APL(tab_str, next(Empty)),
              APL(tab_str, list(COM_token, RBR_token))) };
 
-      thread():
+      thread_single():
         { skip();
           exp: expression();
-          if(token = THR_token, skip(), message());
+          if(token = RTH_token, skip(), message());
           THR(void, exp, void) };
 
       thread_sequence():
         { skip();
-          apl: APL(begin_str, list(SMC_token, TSR_token));
+          apl: APL(begin_str, list(SMC_token, RTS_token));
           THR(void, apl, void) };
 
       ref_case: case(NBR_token => number,
@@ -173,10 +172,9 @@
                      LPR_token => parentheses,
                      LBC_token => braces,
                      LBR_token => brackets,
-                     LTH_token => thread,
                      LTS_token => thread_sequence,
+                     LTH_token => thread_single,
                           else => message);
-
       reference():=
         { cas: ref_case(token); 
           cas() };
@@ -202,24 +200,26 @@
       assignment(Inv): 
         SET(next(Inv), expression());
 
-      thread_answer(Inv):
-        { var: next(scan_data);
-          if(token = LPR_token, skip(), message());
-          if(token = RPR_token,
-             THA(Inv, var, next(Empty)),
-             THA(Inv, var, list(COM_token, RPR_token))) };
-
       thread_question(Inv):
-        { var: next(scan_data);
+        { Inv: next(Inv);
+          Var: next(scan_data);
           if(token = LPR_token, skip(), message());
           if(token = RPR_token,
-             THQ(Inv, var, next(Empty)),
-             THQ(Inv, var, list(COM_token, RPR_token))) };
+             THQ(Inv, Var, next(Empty)),
+             THQ(Inv, Var, list(COM_token, RPR_token))) };
+
+      thread_answer(Inv): 
+        { Inv: next(Inv);
+          Var: next(scan_data);
+          if(token = LPR_token, skip(), message());
+          if(token = RPR_token,
+             THA(Inv, Var, next(Empty)),
+             THA(Inv, Var, list(COM_token, RPR_token))) };
 
       exp_case: case(COL_token => definition,
                      CEQ_token => assignment,
-                     THA_token => thread_answer,
                      THQ_token => thread_question,
+                     THA_token => thread_answer,
                           else => identity);
 
       expression():= 

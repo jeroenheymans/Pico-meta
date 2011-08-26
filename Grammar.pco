@@ -95,11 +95,11 @@
 
   THR_tag: 14;
   THR(Tid, Exp, Dct):
-    [ THR_tag, Tid, Exp, Dct, void, void ];
+    [ THR_tag, Tid, Exp, void, Dct, void ];
   THR_TID_idx: 2;
   THR_EXP_idx: 3;
-  THR_DCT_idx: 4;
   THR_CNT_idx: 5;
+  THR_DCT_idx: 4;
   THR_BUF_idx: 6;
 
   THQ_tag: 15;
@@ -117,15 +117,15 @@
   THA_ARG_idx: 4;
 
   TID_tag: 17;
-  TID(Tid):
-    [ TID_tag, Tid ];
+  TID(Idf):
+    [ TID_tag, Idf ];
   TID_TID_idx: 2;
 
-  THL_tag: 18;
-  THL(Thr, Thl):
-    [ THL_tag, Thr, Thl ];
-  THL_THR_idx: 2;
-  THL_THL_idx: 3;
+  SCH_tag: 18;
+  SCH(Thr, Sch):
+    [ SCH_tag, Thr, Sch ];
+  SCH_THR_idx: 2;
+  SCH_SCH_idx: 3;
 
   Empty:= TAB([]);
   Eoln := TXT(eoln);

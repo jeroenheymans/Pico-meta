@@ -6,47 +6,24 @@
 `*-----------------------------------*`
 { eval(Exp):
     error('evaluator not initialized');
+  eval_main(Exp):
+    error('evaluator not initialized');
         
   init_eval(Dct):
     { DCT: Dct;
+      eval_counter: 0;
+      eval_maximum: 10;
+      eval_thread_expression: void;
+      thread_main_name: "main";
+      thread_exit: void;
+      scheduler_exit: void;
+      scheduler_start: void;
+      scheduler_main: void;
+      scheduler_continuation: void;
+      scheduler_result: void;
 
-      THL_ALL: void;
-      THL_CUR: void;
-      THL_CTR: 0;
-
-      is_thl_cur_set(): not(is_void(THL_CUR));
-
-      set_thl_cur(Thr): THL_CUR:= Thr;
-
-      thl_find(thf):
-        { thl: THL;
-          thr: void;
-          found: false;
-          thf_tid: thf[THR_TID_idx];
-          while(and(not(found), not(is_void(thl))),
-            { thr:= thl[THL_THR_idx];
-              thr_tid: thr[THR_TID_idx];
-              if(thr_tid[NBR_VAL_idx] = thf_tid[NBR_VAL_idx],
-                 found: true,
-                  thl:= thl[THL_THL_idx]) });
-          if(is_void(thl), error('Thread not found'), thl) };
-
-      thl_add_thr(thr):
-        { thr[THR_TID_idx]:= NBR(THL_CTR:= THL_CTR+1);
-          if(is_thl_cur_set(),
-             THL_ALL:= THL(thr,THL_ALL),
-             THL_ALL:= THL_CUR:= THL(thr,THL_ALL));
-          thr[THR_TID_idx] };
-
-      thl_nxt():
-        { nxt: THL_CUR[THL_THL_idx];
-          if(is_void(nxt), THL_CUR:=THL_ALL, THL_CUR:=nxt);
-          THL_CUR };
-
-      oldCall: call;
-      oldContinue: continue;
-      continue(cnt, val):= { DCT:= cnt[2]; oldContinue(cnt[1], val) };
-      call(exp(cont)):= oldCall(exp([cont, DCT])); 
+      old_error: error;
+      error@list:= scheduler_exit(old_error@list);
 
       eval_variable(Exp):
         { nam: Exp[VAR_NAM_idx];
@@ -242,14 +219,61 @@
           cas: assign_case(tag);
           cas(inv, exp) };
 
-      eval_thread(Exp):
-        Exp;
-    
-      eval_thread_question(Exp):
-        Exp;
-    
-      eval_thread_answer(Exp):
-        Exp;
+      eval_thread(thr):
+        { tid: TID(Void);
+          nth: THR(tid, thr[THR_EXP_idx], DCT);
+          scheduler_add(nth, tid);
+          tid };
+
+      ` Evaluate a thread answer `
+      eval_thread_answer(tha):
+        { inv: tha[THA_INV_idx];
+          tid: eval(inv);
+          if(not(tid[TAG_idx] = TID_tag), `the thread we want to answer doesn't exist`
+            tid,
+            { sch: scheduler_find(tid);
+              thr: sch[SCH_THR_idx];
+              thq: void;
+              while(or(is_void(thr[THR_BUF_idx]), `wait for the thread with the question to ask`
+                       not({ thq:= thr[THR_BUF_idx];
+                             thq[TAG_idx] = THQ_tag })), thread_exit());
+              cur_tid: { tmp: scheduler_current[SCH_THR_idx]; tmp:= tmp[THR_TID_idx]; tmp[NBR_VAL_idx] };
+              thq_tid: { tmp: thq[THQ_INV_idx]; tmp:= tmp[TID_TID_idx]; tmp[NBR_VAL_idx] };
+              if(not(cur_tid = thq_tid), `the waiting thread is not waiting for us`
+                tid, 
+                { nam: tha[THA_NAM_idx];
+                  thq_nam: thq[THQ_NAM_idx];
+                  if(not(thq_nam = nam), `is the message the same?`
+                    tid,
+                    { arg: { tmp: tha[THA_ARG_idx]; tmp[TAB_TAB_idx] };
+                      siz: size(arg);
+                      new_tab[(idx: 0) + siz]: eval(arg[idx:= idx+1]);
+                      new_arg: TAB(new_tab);
+                      new_tha: THA(inv, nam, new_arg);
+                      thr[THR_BUF_idx]:= new_tha;
+                      tid }) }) }) };
+
+      ` Evaluate a thread question
+        After the thread is defined, we wait for an answer
+        When the answer is given, we simply take the arguments and bind them `
+      eval_thread_question(thq):
+        { inv: thq[THQ_INV_idx];
+          tid: void; 
+          while({ tid:= eval(inv); not(tid[TAG_idx] = TID_tag) }, thread_exit());
+          thq:= THQ(tid, thq[THQ_NAM_idx], thq[THQ_ARG_idx]);
+          cur: scheduler_current[SCH_THR_idx];
+          cur[THR_BUF_idx]:= thq;
+          answer: void;
+          while({ answer:= cur[THR_BUF_idx]; not(answer[TAG_idx] = THA_tag) }, thread_exit());
+          parameters: { tmp: thq[THQ_ARG_idx]; tmp[TAB_TAB_idx] };
+          arguments: { tmp: answer[THA_ARG_idx]; tmp[TAB_TAB_idx] };
+          siz: size(arg);
+          while(siz > 0,
+            { set: SET(parameters[siz], arguments[siz]);
+              eval_assignment(set);
+              siz:= siz-1 });
+          cur[THR_BUF_idx]:= void;
+          tid };
     
       eval_identity(Exp):
         Exp;
@@ -260,18 +284,74 @@
                       DEF_tag => eval_definition,
                       SET_tag => eval_assignment,
                       THR_tag => eval_thread,
-                      THQ_tag => eval_thread_question,
                       THA_tag => eval_thread_answer,
+                      THQ_tag => eval_thread_question,
                          else => eval_identity);
   
       init_eval(Dct):=
         { DCT:= Dct;
           void };
 
+      ` Start the scheduler. As long as there is no result, keep on
+        evaluating. Switching from thread is done in eval_thread_expression `
+      scheduler_start():=
+        { while(is_void(scheduler_result),
+            { scn: scheduler_current:= scheduler_next();
+              nxt: scn[SCH_THR_idx];
+              call(
+                { scheduler_continuation:= cont;
+                  exp: nxt[THR_EXP_idx];
+                  cnt: nxt[THR_CNT_idx];
+                  DCT:= nxt[THR_DCT_idx];
+                  if(is_void(cnt),
+                    eval_thread_expression(exp),
+                    continue(cnt, cnt)) }) });
+          scheduler_result };
+
+      ` Exit the scheduler completely `
+      scheduler_exit(Result):=
+        { scheduler_result:= Result;
+          continue(scheduler_continuation, scheduler_continuation) };
+
+      ` Save the current contination and continue the scheduler's one `
+      thread_exit():=
+        { thr: scheduler_current[SCH_THR_idx];
+          thr[THR_DCT_idx]:= DCT;
+          call(
+            { thr[THR_CNT_idx]:= cont;
+              continue(scheduler_continuation, scheduler_continuation) }) };
+
+      ` Evaluation of an expression. If we reached maximum evaluated
+        expressions in a thread, we switch to another thread `
       eval(Exp):=
-        { tag: Exp[TAG_idx];
+        { if(scheduler_is_current_set(),
+            if(not(eval_counter < eval_maximum),
+              { eval_counter:= 0;
+                thread_exit() },
+              eval_counter:= eval_counter+1), void);
+          tag: Exp[TAG_idx];
           cas: eval_case(tag);
           cas(Exp) };
+
+      ` Start the evaluation of a thread. If it's the main thread,
+        we make sure it will only be evaluated once `
+      eval_thread_expression(Exp):=
+        { thr: scheduler_current[SCH_THR_idx];
+          main: scheduler_main[SCH_THR_idx];
+          if(equivalent(thr, main),
+            scheduler_exit(eval(Exp)),
+            while(true, eval(Exp))) };
+
+      ` Gets called when a new expression is inputted. It adds
+        the expression to a main-thread and starts the scheduler `
+      eval_main(Exp):=
+        { thr: THR(void, Exp, void);
+          tid: TID(void);
+          scheduler_init();
+          scheduler_main:= scheduler_add(thr, tid);
+          DCT:= add(thread_main_name, tid, DCT);
+          thr[THR_DCT_idx]:= DCT;
+          scheduler_start() };
   
       void };
 

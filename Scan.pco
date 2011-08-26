@@ -24,12 +24,12 @@
   SMC_token: 18; 
   TXT_token: 19;
   XOP_token: 20;
-  LTH_token: 21; `(:`
-  RTH_token: 22; `:)`
-  LTS_token: 23; `{:`
-  RTS_token: 24; `:}`
-  THA_token: 25; `:!:`
-  THQ_token: 26; `:?:`
+  LTH_token: 21; 
+  RTH_token: 22; 
+  LTS_token: 23; 
+  RTS_token: 24; 
+  THQ_token: 25; 
+  THA_token: 26; 
   
   scan_data: void;
   
@@ -113,14 +113,19 @@
                 if((pos:= pos+1) > size(input),
                    32,
                    ord(input[pos])));
+
+      rewind_ch():
+        ch:= if(pos = 0,
+                0,
+                ord(input[pos:= pos-1]));
                         
       next_ch(Tkn):
         { skip_ch();
-          Tkn };
-
+          Tkn }; 
+ 
       prev_ch(Tkn):
-         { ch:=if(pos = 0,0,ord(input[pos:=pos-1]));
-           Tkn };
+        { rewind_ch();
+          Tkn };
                 
       freeze():
         hold:= pos;
@@ -157,11 +162,11 @@
       bkq_allowed: mask(bkq,eol);
       col_allowed: mask(col);
       dgt_allowed: mask(dgt);
-      exc_allowed: mask(exc);
       eql_allowed: mask(eql);
+      exc_allowed: mask(exc);
       exp_allowed: mask(exp);
       nam_allowed: mask(dgt,exp,ltr);
-      opr_allowed: mask(aop,eql,mns,mop,pls,rop,pow,exc,que);
+      opr_allowed: mask(aop,eql,mns,mop,pls,rop,exc,que,pow);
       per_allowed: mask(per);
       que_allowed: mask(que);
       quo_allowed: mask(quo);
@@ -212,26 +217,29 @@
           
       cat_fun():  
         next_ch(CAT_token);
+
+      thr_fun():
+        { if(check(rbc_allowed),
+             next_ch(RTS_token),
+             if(check(rpr_allowed),
+                next_ch(RTH_token),
+                if(check(que_allowed),
+                   { skip_ch();
+                     if(check(col_allowed),
+                        next_ch(THQ_token),
+                        prev_ch(COL_token)) },
+                   if(check(exc_allowed),
+                     { skip_ch();
+                       if(check(col_allowed),
+                          next_ch(THA_token),
+                          prev_ch(COL_token)) },
+                     COL_token)))) };
           
       col_fun():
         { skip_ch();
           if(check(eql_allowed),
              next_ch(CEQ_token),
-             if(check(rpr_allowed),
-                next_ch(RTH_token),
-                if(check(rbc_allowed),
-                   next_ch(RTS_token),
-                   if(check(que_allowed),
-                      { skip_ch();
-                        if(check(col_allowed),
-                           next_ch(THQ_token),
-                           prev_ch(COL_token)) },
-                      if(check(exc_allowed),
-                         { skip_ch();
-                           if(check(col_allowed),
-                              next_ch(THA_token),
-                              prev_ch(COL_token)) },
-                          COL_token)))))};
+             thr_fun()) };
           
       com_fun():  
         next_ch(COM_token);
@@ -250,7 +258,7 @@
           END_token };
           
       lbc_fun():  
-        { skip_ch(); 
+        { skip_ch();
           if(check(col_allowed),
              next_ch(LTS_token),
              LBC_token) };

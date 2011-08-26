@@ -84,15 +84,10 @@
             
       print_dictionary(Exp): 
         display('<dictionary>');
-
+            
       print_thread(Exp): 
-        display('<thread ',print_expression(Exp[THR_EXP_idx]),'>');
-
-      print_thread_question(Exp): 
-        display('<thread_question>');
-
-      print_thread_answer(Exp): 
-        display('<thread_answer>');
+        { idf: Exp[TID_TID_idx];
+          display('<thread ', idf[NBR_VAL_idx], '>')};
             
       exp_case: case(NBR_tag => print_number,
                      FRC_tag => print_fraction,
@@ -105,10 +100,8 @@
                      TBL_tag => print_tabulation,
                      DEF_tag => print_definition,
                      SET_tag => print_assignment,
+                     TID_tag => print_thread,
                      DCT_tag => print_dictionary,
-                     THR_tag => print_thread,
-                     THQ_tag => print_thread_question,
-                     THA_tag => print_thread_answer,
                      VOI_tag => print_void);
       
       print_expression(Exp):=

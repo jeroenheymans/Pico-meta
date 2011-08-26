@@ -10,7 +10,7 @@
       entry: accept(); 
       while(not(entry = ''),
             { display(eoln);
-              print(eval(read(entry)));
+              print(eval_main(read(entry)));
               display(eoln);
               entry:= accept() });
       display(eoln, 'end Pico') };

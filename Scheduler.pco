@@ -1,0 +1,32 @@
+{ scheduler_list: void;
+  scheduler_current: void;
+  scheduler_counter: 0;
+
+  scheduler_init():
+    { scheduler_list:= void;
+      scheduler_current:= void;
+      scheduler_counter:= 0 };
+
+  scheduler_is_current_set(): not(is_void(scheduler_current));
+
+  scheduler_add(thr, tid):
+    { scheduler_counter:= scheduler_counter+1;
+      thr[THR_TID_idx]:= tid[TID_TID_idx]:= NBR(scheduler_counter);
+      sch: SCH(thr, scheduler_list);
+      if(scheduler_is_current_set(), scheduler_list:= sch, scheduler_list:= scheduler_current:= sch) };
+
+  scheduler_next():
+    { nxt: scheduler_current[SCH_SCH_idx];
+      if(is_void(nxt), scheduler_list, nxt) };
+
+  scheduler_find(tid):
+    { sch: scheduler_list;
+      notfound: true;
+      while(and(notfound, not(is_void(sch))),
+        { thr: sch[SCH_THR_idx];
+          thr_idf: thr[THR_TID_idx];
+          tid_idf: tid[TID_TID_idx];
+          if(thr_idf[NBR_VAL_idx] = tid_idf[NBR_VAL_idx], notfound:= false, sch:= sch[SCH_SCH_idx]) });
+      if(is_void(sch), error('thread not found'), sch) };
+
+  display('scheduler installed', eoln) }

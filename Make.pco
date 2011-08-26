@@ -5,12 +5,19 @@
 `*              (c)1997              *`
 `*-----------------------------------*`
 { load("Grammar.pco");
-  load("Scan.pco"   );
-  load("Case.pco"   );
-  load("Read.pco"   );
-  load("Dict.pco"   );
-  load("Eval.pco"   );
-  load("Print.pco"  );
-  load("Global.pco" );
-  load("Pico.pco"   ) }
+  load("Scan.pco");
+  load("Case.pco");
+  load("Read.pco");
+  load("Dict.pco");
+  load("Scheduler.pco");
+  load("Eval.pco");
+  load("Print.pco");
+  load("Global.pco");
+  load("Pico.pco") }
 
+`
+{ a: 5; b: 6; main; c: {: a*b :}; d: (: a*b :)}
+{ i: 0; display("run", eoln); p1: {: i:= i+1; display("p1 ", i, eoln) :}; p2: {: i:= i+1; display("p2 ", i, eoln) :}; while(i < 20, void) }
+{ i: 0; display("run", eoln); p1: {: display("p1 ", eoln) :}; p2: {: display("p2 ", eoln) :}; p3: {: display("p3 ", eoln) :}; p4: {: display("p4 ", eoln) :}; while((i:= i+1) < 20, display("main ", i, eoln)) }
+{ i: 0; display("run", eoln); p1: {: display("p1 ", eoln) :}; p2: {: display("p2 ", eoln) :}; p3: {: j: 0; while((j:= j+1) < 10, display("p3 ", j, eoln)) :}; while((i:= i+1) < 20, display("main ", i, eoln)); bla }
+`
