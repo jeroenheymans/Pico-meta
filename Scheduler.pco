@@ -9,9 +9,12 @@
 
   scheduler_is_current_set(): not(is_void(scheduler_current));
 
+  scheduler_set_current(sch): scheduler_current:= sch;
+
   scheduler_add(thr, tid):
     { scheduler_counter:= scheduler_counter+1;
-      thr[THR_TID_idx]:= tid[TID_TID_idx]:= NBR(scheduler_counter);
+      thr[THR_TID_idx]:= NBR(scheduler_counter);
+      tid[TID_TID_idx]:= NBR(scheduler_counter);
       sch: SCH(thr, scheduler_list);
       if(scheduler_is_current_set(), scheduler_list:= sch, scheduler_list:= scheduler_current:= sch) };
 

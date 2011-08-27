@@ -23,7 +23,7 @@
       scheduler_result: void;
 
       old_error: error;
-      error@list:= scheduler_exit(old_error@list);
+      `error@list:= scheduler_exit(old_error@list);`
 
       eval_variable(Exp):
         { nam: Exp[VAR_NAM_idx];
@@ -267,7 +267,7 @@
           while({ answer:= cur[THR_BUF_idx]; not(answer[TAG_idx] = THA_tag) }, thread_exit());
           parameters: { tmp: thq[THQ_ARG_idx]; tmp[TAB_TAB_idx] };
           arguments: { tmp: answer[THA_ARG_idx]; tmp[TAB_TAB_idx] };
-          siz: size(arg);
+          siz: size(arguments);
           while(siz > 0,
             { set: SET(parameters[siz], arguments[siz]);
               eval_assignment(set);
@@ -296,8 +296,9 @@
         evaluating. Switching from thread is done in eval_thread_expression `
       scheduler_start():=
         { while(is_void(scheduler_result),
-            { scn: scheduler_current:= scheduler_next();
+            { scn: scheduler_next();
               nxt: scn[SCH_THR_idx];
+              scheduler_set_current(scn);
               call(
                 { scheduler_continuation:= cont;
                   exp: nxt[THR_EXP_idx];

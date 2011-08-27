@@ -20,4 +20,6 @@
 { i: 0; display("run", eoln); p1: {: i:= i+1; display("p1 ", i, eoln) :}; p2: {: i:= i+1; display("p2 ", i, eoln) :}; while(i < 20, void) }
 { i: 0; display("run", eoln); p1: {: display("p1 ", eoln) :}; p2: {: display("p2 ", eoln) :}; p3: {: display("p3 ", eoln) :}; p4: {: display("p4 ", eoln) :}; while((i:= i+1) < 20, display("main ", i, eoln)) }
 { i: 0; display("run", eoln); p1: {: display("p1 ", eoln) :}; p2: {: display("p2 ", eoln) :}; p3: {: j: 0; while((j:= j+1) < 10, display("p3 ", j, eoln)) :}; while((i:= i+1) < 20, display("main ", i, eoln)); bla }
+
+{ i:j:0; p1:p2:void; p1 := {: i:= i+1; p2 :!: val(i); display("p1 sends : ", i, eoln) :}; p2 := {: p1 :?: val(j); display("p2 receives : ", j, eoln) :}; while(i<3,void) }
 `

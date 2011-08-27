@@ -98,8 +98,8 @@
     [ THR_tag, Tid, Exp, void, Dct, void ];
   THR_TID_idx: 2;
   THR_EXP_idx: 3;
-  THR_CNT_idx: 5;
-  THR_DCT_idx: 4;
+  THR_CNT_idx: 4;
+  THR_DCT_idx: 5;
   THR_BUF_idx: 6;
 
   THQ_tag: 15;
