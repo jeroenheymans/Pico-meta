@@ -12,7 +12,7 @@
   init_eval(Dct):
     { DCT: Dct;
       eval_counter: 0;
-      eval_maximum: 10;
+      eval_maximum: 6;
       eval_thread_expression: void;
       thread_main_name: "main";
       thread_exit: void;

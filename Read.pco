@@ -38,8 +38,10 @@
       message@any:
         error('Unexpected ', msg_tab[token]);
           
-      skip():
+      skip(): {
         token:= scan();
+        error('Token: ',token);
+        token };
         
       next(Dat):
         { skip();
@@ -213,8 +215,19 @@
           Var: next(scan_data);
           if(token = LPR_token, skip(), message());
           if(token = RPR_token,
-             THA(Inv, Var, next(Empty)),
-             THA(Inv, Var, list(COM_token, RPR_token))) };
+             res:THA(Inv, Var, next(Empty)),
+             res:THA(Inv, Var, list(COM_token, RPR_token)));
+          if(token = THQ_token,
+             `res:=thread_question(res), `
+             { Inv: next(Inv);
+               Var: next(scan_data);
+               if(token = LPR_token, skip(), message());
+               error(THQ(Void, Void, Void))
+               `if(token = RPR_token,
+                  res:=THQ(Inv, Var, next(Empty)),
+                  res:=THQ(Inv, Var, list(COM_token, RPR_token)))` },
+             void);
+          res };
 
       exp_case: case(COL_token => definition,
                      CEQ_token => assignment,
