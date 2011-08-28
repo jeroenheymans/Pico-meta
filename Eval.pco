@@ -12,7 +12,7 @@
   init_eval(Dct):
     { DCT: Dct;
       eval_counter: 0;
-      eval_maximum: 6;
+      eval_maximum: 8;
       eval_thread_expression: void;
       thread_main_name: "main";
       thread_exit: void;
@@ -23,7 +23,7 @@
       scheduler_result: void;
 
       old_error: error;
-      `error@list:= scheduler_exit(old_error@list);`
+      error@list:= scheduler_exit(old_error@list);
 
       eval_variable(Exp):
         { nam: Exp[VAR_NAM_idx];
